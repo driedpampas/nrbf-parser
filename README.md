@@ -14,11 +14,8 @@ This format is commonly used by .NET applications and Unity games for binary ser
 
 ## Installation
 
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-nrbf-parser = "0.1.0" # Or use path/git reference
+```bash
+cargo add nrbf-parser
 ```
 
 ## Usage

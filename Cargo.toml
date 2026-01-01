@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 authors = ["driedpampas@proton.me"]
 description = "A high-performance MS-NRBF binary parser and encoder for Rust"
+repository = "https://github.com/driedpampas/nrbf-parser"
 license = "GPL-3.0-or-later"
 readme = "README.md"
 keywords = ["nrbf", "dotnet", "unity", "parser", "encoder"]
