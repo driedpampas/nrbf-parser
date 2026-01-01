@@ -1,0 +1,16 @@
+[package]
+name = "nrbf-parser"
+version = "0.1.0"
+edition = "2024"
+authors = ["driedpampas@proton.me"]
+description = "A high-performance MS-NRBF binary parser and encoder for Rust"
+license = "GPL-3.0-or-later"
+readme = "README.md"
+keywords = ["nrbf", "dotnet", "unity", "parser", "encoder"]
+categories = ["encoding", "parser-implementations"]
+
+[dependencies]
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
