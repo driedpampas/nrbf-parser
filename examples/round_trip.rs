@@ -16,6 +16,7 @@
 
 use nrbf_parser::Decoder;
 use nrbf_parser::Encoder;
+use nrbf_parser::interleaved::{from_interleaved, to_interleaved};
 use nrbf_parser::records::Record;
 use std::env;
 use std::fs::File;
@@ -53,6 +54,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     std::fs::write(json_path, &json)?;
     println!("Saved records to {}", json_path);
 
+    // Serialize to Interleaved JSON
+    let interleaved_json = to_interleaved(&records);
+    let interleaved_json_str = serde_json::to_string_pretty(&interleaved_json)?;
+    let interleaved_path = "interleaved.json";
+    std::fs::write(interleaved_path, &interleaved_json_str)?;
+    println!("Saved interleaved records to {}", interleaved_path);
+
     // Deserialize from JSON
     let deserialized_records: Vec<Record> = serde_json::from_str(&json)?;
     println!(
@@ -72,27 +80,42 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     drop(encoder);
     println!("Reconstructed binary saved to {}", output_path);
 
-    // Compare
-    let mut reconstructed_data = Vec::new();
-    File::open(output_path)?.read_to_end(&mut reconstructed_data)?;
+    // Interleaved reconstruction check
+    println!("--- Interleaved Round Trip Check ---");
+    let interleaved_reconstructed_records = from_interleaved(interleaved_json);
+    println!(
+        "Deserialized {} records from Interleaved JSON.",
+        interleaved_reconstructed_records.len()
+    );
 
-    if original_data == reconstructed_data {
-        println!("SUCCESS: Reconstructed binary is identical to original!");
+    let interleaved_output_path = "reconstructed_interleaved.meta";
+    let int_out_file = File::create(interleaved_output_path)?;
+    let mut int_encoder = Encoder::new(BufWriter::new(int_out_file));
+
+    for record in &interleaved_reconstructed_records {
+        int_encoder.encode(record)?;
+    }
+    drop(int_encoder);
+
+    let mut int_reconstructed_data = Vec::new();
+    File::open(interleaved_output_path)?.read_to_end(&mut int_reconstructed_data)?;
+
+    if original_data == int_reconstructed_data {
+        println!("SUCCESS: Interleaved reconstructed binary is identical to original!");
     } else {
-        println!("FAILURE: Reconstructed binary differs from original.");
+        println!("FAILURE: Interleaved reconstructed binary differs from original.");
         println!(
             "Original size: {}, Reconstructed size: {}",
             original_data.len(),
-            reconstructed_data.len()
+            int_reconstructed_data.len()
         );
-
         // Find first difference
-        let min_len = std::cmp::min(original_data.len(), reconstructed_data.len());
+        let min_len = std::cmp::min(original_data.len(), int_reconstructed_data.len());
         for i in 0..min_len {
-            if original_data[i] != reconstructed_data[i] {
+            if original_data[i] != int_reconstructed_data[i] {
                 println!(
                     "First difference at offset 0x{:x}: original 0x{:02x}, reconstructed 0x{:02x}",
-                    i, original_data[i], reconstructed_data[i]
+                    i, original_data[i], int_reconstructed_data[i]
                 );
                 break;
             }

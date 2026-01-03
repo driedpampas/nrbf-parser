@@ -19,6 +19,7 @@
 pub mod decoder;
 pub mod encoder;
 pub mod error;
+pub mod interleaved;
 pub mod records;
 
 pub use decoder::Decoder;

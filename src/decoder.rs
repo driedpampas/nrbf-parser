@@ -459,13 +459,13 @@ impl<R: Read> Decoder<R> {
                 let mut buf = [0u8; 8];
                 self.reader.read_exact(&mut buf)?;
                 self.offset += 8;
-                Ok(PrimitiveValue::Int64(i64::from_le_bytes(buf)))
+                Ok(PrimitiveValue::TimeSpan(i64::from_le_bytes(buf)))
             }
             PrimitiveType::DateTime => {
                 let mut buf = [0u8; 8];
                 self.reader.read_exact(&mut buf)?;
                 self.offset += 8;
-                Ok(PrimitiveValue::Int64(i64::from_le_bytes(buf)))
+                Ok(PrimitiveValue::DateTime(u64::from_le_bytes(buf)))
             }
             PrimitiveType::SByte => Ok(PrimitiveValue::SByte(self.read_u8()? as i8)),
             PrimitiveType::Single => {
